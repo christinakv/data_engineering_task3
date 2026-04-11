@@ -9,15 +9,12 @@ def lcm(x: Any, y: Any) -> str:
         if x is None or y is None:
             return "NaN"
         
-        if not (str(x).isdigit() and str(y).isdigit()):
+        if not (str(x).isdecimal() and str(y).isdecimal()):
             return "NaN"
 
         val_x, val_y = int(x), int(y)
 
-        if val_x == 0 or val_y == 0:
-            return "0" 
-
-        result = abs(val_x * val_y) // math.gcd(val_x, val_y)
+        result = math.lcm(val_x, val_y)
         return str(result)
 
     except Exception:
