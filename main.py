@@ -6,22 +6,24 @@ app = FastAPI()
 
 def lcm(x: Any, y: Any) -> str:
     try:
+        if x is None or y is None:
+            return "NaN"
+        
         if not (str(x).isdigit() and str(y).isdigit()):
             return "NaN"
 
-        x, y = int(x), int(y)
+        val_x, val_y = int(x), int(y)
 
-        if x == 0 or y == 0:
-            return 0
+        if val_x == 0 or val_y == 0:
+            return "0" 
 
-        result = abs(x * y) // math.gcd(x, y)
+        result = abs(val_x * val_y) // math.gcd(val_x, val_y)
         return str(result)
 
-    except(ValueError, ZeroDivisionError, TypeError, AttributeError):
+    except Exception:
         return "NaN"
 
 @app.get("/christina_kim_1233_gmail_com")
-async def christina_kim_1233_gmail_com(x: str=None, y: str=None):
-    result = lcm(x, y)
-    return Response(content=result, media_type="text/plain")
-
+async def christina_kim_1233_gmail_com(x: str = None, y: str = None):
+    result_text = lcm(x, y)
+    return Response(content=result_text, media_type="text/plain")
