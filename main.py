@@ -1,33 +1,40 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request, Response
 import math
 
 app = FastAPI()
 
-def get_lcm(a: int, b: int) -> int:
-    if hasattr(math, "lcm"):
-        return math.lcm(a, b)
-    if a == 0 or b == 0:
-        return 0
-    return abs(a * b) // math.gcd(a, b)
-
+# Declaring both with and without the slash prevents 307 Redirects
 @app.get("/christina_kim_1233_gmail_com")
-async def christina_kim_1233_gmail_com(x: str = None, y: str = None):
-    # 1. Missing parameters
-    if x is None or y is None:
-        return Response(content="NaN", media_type="text/plain")
+@app.get("/christina_kim_1233_gmail_com/")
+async def calculate_lcm(request: Request):
     
-    # 2. Strip whitespace and leading '+' signs
-    clean_x = x.strip().lstrip("+")
-    clean_y = y.strip().lstrip("+")
+    # 1. Extract raw parameters directly from the URL
+    x_str = request.query_params.get("x")
+    y_str = request.query_params.get("y")
 
-    # 3. Check for non-negative integers
-    if not (clean_x.isdecimal() and clean_y.isdecimal()):
+    # 2. Check for missing parameters
+    if x_str is None or y_str is None:
         return Response(content="NaN", media_type="text/plain")
 
-    # 4. Calculate
+    # 3. .isdigit() strictly ensures only numbers 0-9 exist.
+    # This automatically fails negative numbers, floats, letters, or hidden spaces.
+    if not (x_str.isdigit() and y_str.isdigit()):
+        return Response(content="NaN", media_type="text/plain")
+
+    # 4. Calculate LCM
     try:
-        val_x, val_y = int(clean_x), int(clean_y)
-        result = get_lcm(val_x, val_y)
-        return Response(content=str(result), media_type="text/plain")
+        x_val = int(x_str)
+        y_val = int(y_str)
+
+        if x_val == 0 or y_val == 0:
+            ans = 0
+        else:
+            # Python natively supports arbitrarily large integers. 
+            # Using integer floor division (//) prevents it from ever converting to a float.
+            ans = (x_val * y_val) // math.gcd(x_val, y_val)
+            
+        # 5. Return exclusively raw text digits
+        return Response(content=str(ans), media_type="text/plain")
+        
     except Exception:
         return Response(content="NaN", media_type="text/plain")
